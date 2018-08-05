@@ -2,21 +2,37 @@ const express = require("express");
 const app = express();
 const productRoutes = require("./api/routes/products");
 const orderRoutes = require("./api/routes/orders");
+const bodyParser = require("body-parser");
 const morgan = require("morgan");
 
-// POC code
-/* app.use((req, res, next) => {
-    res.status(200).json({
-        message: "It works"
-    });
-}); */
+// Make use of morgan and body-parser imports
 
-//Prod code
-/** 1st arguemnt is a filter for urls containing "products"
- *  the 2nd arguement is a reference to the functionality
- *  that will handle the GET request e.g. products.js, orders.js etc.
- **/
 app.use(morgan("dev"));
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
+// Dealing with CORS
+
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+    if (req.method === "OPTIONS") {
+        res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
+        return res.status(200).json({});
+    }
+    next();
+});
+
+/** 
+ *  1st argument is a filter for urls containing "products"
+ *  whilst the 2nd arguement is a reference to the functionality
+ *  that will handle the various requests e.g. products.js, orders.js etc.
+ **/
+
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
 
