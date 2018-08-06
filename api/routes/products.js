@@ -86,7 +86,7 @@ router.patch("/:productId", (req, res, next) => {
 });
 
 router.delete("/:productId", (req, res, next) => {
-    id = req.params.productId
+    const id = req.params.productId;
     Product.remove({_id: id})
         .exec()
         .then(result => {
