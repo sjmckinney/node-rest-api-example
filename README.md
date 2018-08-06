@@ -1,4 +1,4 @@
-##NODE REST EXAMPLE
+## NODE REST API EXAMPLE
 
 Uses Express as webserver.
 
@@ -29,3 +29,15 @@ app.use((req, res, next) => {
     next();
 });
 ```
+
+### Data Persistence With MongoDb Atlas and Mongoose
+
+Create a connection to db in app.js.
+
+To work the Mongoose way create a "model" for the objects product and order objects.
+
+Within the 'models/product.js' and 'models/order.js' files define the schema for the product and order objects using Mongoose functionality.
+
+Use methods defined on each schema object to create, find, update and delete objects within the database.
+
+Parameters are passed in the URL for GET and DELETE operations and extracted from the body for all other types.

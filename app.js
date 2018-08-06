@@ -4,12 +4,17 @@ const productRoutes = require("./api/routes/products");
 const orderRoutes = require("./api/routes/orders");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
+const mongoose = require("mongoose");
 
 // Make use of morgan and body-parser imports
 
 app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+
+// Set up db connection
+
+mongoose.connect(`mongodb+srv://api-rest-rw-user:${process.env.MONGODB_ATLAS_CONNECTION_PWD}@cluster0-nebbb.mongodb.net/test?retryWrites=true`, { useNewUrlParser: true });
 
 // Dealing with CORS
 
@@ -29,7 +34,7 @@ app.use((req, res, next) => {
 
 /** 
  *  1st argument is a filter for urls containing "products"
- *  whilst the 2nd arguement is a reference to the functionality
+ *  whilst the 2nd argument is a reference to the functionality
  *  that will handle the various requests e.g. products.js, orders.js etc.
  **/
 
