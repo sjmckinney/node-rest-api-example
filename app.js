@@ -3,6 +3,7 @@ const app = express();
 const productRoutes = require("./api/routes/products");
 const orderRoutes = require("./api/routes/orders");
 const userRoutes = require("./api/routes/users");
+const Status = require("./api/routes/status_codes");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
@@ -28,7 +29,7 @@ app.use((req, res, next) => {
     );
     if (req.method === "OPTIONS") {
         res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
-        return res.status(200).json({});
+        return res.status(Status.Success).json({});
     }
     next();
 });
@@ -47,19 +48,19 @@ app.use("/users", userRoutes);
 
 app.use((req, res, next) => {
     const error = new Error(`End point '${req.protocol}://${req.hostname}:${req.socket.localPort+req.path}' not found.`);
-    error.status = 404;
+    error.status = Status.NotFound;
     next(error);
 });
 
 // Capture any other errors that arise.
 
 app.use((error, req, res, next) => {
-    res.status(error.status || 500);
+    res.status(error.status || Status.ServerError);
     res.json({
         error: {
             message: error.message
         }
-    })
+    });
 });
 
 module.exports = app;

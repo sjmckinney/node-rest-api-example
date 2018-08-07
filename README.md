@@ -40,7 +40,8 @@ The password value can be held in the file `nodemon.json` and excluded from bein
 ```json
     {
         "env": {
-            "MONGODB_ATLAS_CONNECTION_PWD": "my_password_value"
+            "MONGODB_ATLAS_CONNECTION_PWD": "my_password_value",
+            "JWT_KEY": "my_secret_value"
         }
     }
 ```
@@ -85,3 +86,38 @@ To start in debug node issue the command `./node_modules/nodemon/bin/nodemon.js 
 Then initiate a call to an endpoint using an external tool. Having selected the _Debug view_ select the _Node: Nodemon_ entry from the drop down and start the debug session (click the green button or _F5_).
 
 This will cause a dropdown to appear that will list all the running processes. Select the one that contains the text `node --inspect server.js`. The process should continue to hit the first breakpoint.
+
+### Securing Routes With Json Web Tokens (JWT)
+
+API end points do not use sessions and yet some form of authentication is often desirable.
+
+Not all routes need protecting; GET all products and GET a product by id do not require protection as there are many scenarios where an unauthenticated user should have read-only access to browse or search collections.
+
+The remaining product end points and all order end points should be protected from unauthenticated access.
+
+When used for authentication, once the user has successfully logged in using their credentials, a JWT will be returned. Best practice is to expire the JWT after a period to prevent its unauthorized reuse.
+
+Whenever the user wants to access a protected route or resource, the user agent should send the JWT, typically in the Authorization header using the Bearer schema. The content of the header should look like the following:
+
+`Authorization: Bearer <token>`
+
+This can be, in certain cases, a stateless authorization mechanism. The server's protected routes will check for a valid JWT in the Authorization header, and if it's present, the user will be allowed to access protected resources.
+
+A JWT is generated following successful authenication of the user in the following way
+```javascript
+if(result) {
+            const token = jwt.sign({
+                email: user[0].email,
+                userId: user[0]._id
+            },
+            process.env.JWT_KEY,
+            {
+                expiresIn: "1h"
+            }
+            );
+            return res.status(Status.Success).json({
+                message: "User authentication succeeded",
+                token: token
+            });
+        }
+```
