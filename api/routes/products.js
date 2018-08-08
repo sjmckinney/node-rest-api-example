@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Product = require("../models/product");
 const Status = require("../routes/status_codes");
+const checkAuth = require("../authentication/check-auth");
 
 //Implement POST and GET routes
 
@@ -21,7 +22,7 @@ router.get("/", (req, res, next) => {
         });
 });
 
-router.post("/", (req, res, next) => {
+router.post("/", checkAuth, (req, res, next) => {
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
@@ -32,8 +33,9 @@ router.post("/", (req, res, next) => {
         .then(result => {
             console.log(result);
             res.status(Status.Created).json({
-                message: `Created product ${name}`,
+                message: `Created product ${result.name}`,
                 createdProduct: product
+            })
         })
         .catch(err => {
             console.log(err);
@@ -41,7 +43,6 @@ router.post("/", (req, res, next) => {
                 error: err
             });
         });
-    });
 });
 
 router.get("/:productId", (req, res, next) => {
@@ -66,7 +67,7 @@ router.get("/:productId", (req, res, next) => {
         });
 });
 
-router.patch("/:productId", (req, res, next) => {
+router.patch("/:productId", checkAuth, (req, res, next) => {
     const id = req.params.productId;
     const updateOps = {};
     for(const ops of req.body){
@@ -86,7 +87,7 @@ router.patch("/:productId", (req, res, next) => {
         });
 });
 
-router.delete("/:productId", (req, res, next) => {
+router.delete("/:productId", checkAuth, (req, res, next) => {
     const id = req.params.productId;
     Product.remove({_id: id})
         .exec()

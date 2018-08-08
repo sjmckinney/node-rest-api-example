@@ -103,7 +103,7 @@ Whenever the user wants to access a protected route or resource, the user agent 
 
 This can be, in certain cases, a stateless authorization mechanism. The server's protected routes will check for a valid JWT in the Authorization header, and if it's present, the user will be allowed to access protected resources.
 
-A JWT is generated following successful authenication of the user in the following way
+A JWT is generated following successful authenication of the user in the following way;
 ```javascript
 if(result) {
             const token = jwt.sign({
@@ -121,3 +121,20 @@ if(result) {
             });
         }
 ```
+
+The authentication function `checkAuth` is, as per the 'Express' pattern, used as _middleware_ and inserted into the parameters for the end points concerned.
+```javascript
+router.post("/", checkAuth, (req, res, next) => {
+    const product = new Product({
+        _id: new mongoose.Types.ObjectId(),
+        name: req.body.name,
+        price: req.body.price
+    });
+    product
+        .save()
+        .then(result => {
+        ...
+```
+Using the JWT method `verify` the value contained in the _authorization_ header is decoded back into its constituent parts; _header_, _payload_ & _signature_.
+
+If the token has expired then a `TokenExpiredError` will be thrown and the `verify` method will return false. If the signature part of token matches the result of hashing the _header_ and _payload_ sections of the token with the same secret that was used to create the token when it was issued at login then it is valid.
