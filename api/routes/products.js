@@ -1,105 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
-const Product = require("../models/product");
-const Status = require("../routes/status_codes");
+
 const checkAuth = require("../authentication/check-auth");
+const ProductController = require("../controllers/products");
 
-//Implement POST and GET routes
+router.get("/", ProductController.products_get_all);
 
-router.get("/", (req, res, next) => {
-    Product.find()
-        .exec()
-        .then(docs => {
-            console.log(docs);
-            res.status(Status.Success).json(docs);
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(Status.ServerError).json({
-                error: err
-            });
-        });
-});
+router.post("/", checkAuth, ProductController.products_create_product);
 
-router.post("/", checkAuth, (req, res, next) => {
-    const product = new Product({
-        _id: new mongoose.Types.ObjectId(),
-        name: req.body.name,
-        price: req.body.price
-    });
-    product
-        .save()
-        .then(result => {
-            console.log(result);
-            res.status(Status.Created).json({
-                message: `Created product ${result.name}`,
-                createdProduct: product
-            })
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(Status>ServerError).json({
-                error: err
-            });
-        });
-});
+router.get("/:productId", ProductController.products_get_product_by_id);
 
-router.get("/:productId", (req, res, next) => {
-    const id = req.params.productId;
-    Product.findById(id)
-        .exec()
-        .then(doc => {
-            if(doc){
-                console.log("From database: ", doc);
-                res.status(Status.Success).json(doc);
-            } else {
-                res.status(Status.NotFound).json({
-                    message: `Valid entry not found for id ${id}`
-                });
-            }
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(Status.ServerError).json({
-                error: err
-            });
-        });
-});
+router.patch("/:productId", checkAuth, ProductController.products_update_product_by_id);
 
-router.patch("/:productId", checkAuth, (req, res, next) => {
-    const id = req.params.productId;
-    const updateOps = {};
-    for(const ops of req.body){
-        updateOps[ops.propName] = ops.value;
-    }
-    Product.update({_id: id}, {$set: updateOps})
-        .exec()
-        .then(result => {
-            console.log(result);
-            res.status(Status.Success).json(result);
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(Status.ServerError).json({
-                error: err
-            });
-        });
-});
-
-router.delete("/:productId", checkAuth, (req, res, next) => {
-    const id = req.params.productId;
-    Product.remove({_id: id})
-        .exec()
-        .then(result => {
-            res.status(Status.Success).json(result)
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(Status.ServerError).json({
-                error: err
-            });
-        });
-});
+router.delete("/:productId", checkAuth, ProductController.products_delete_product_by_id);
 
 module.exports = router;

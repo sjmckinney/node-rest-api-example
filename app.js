@@ -1,12 +1,13 @@
 const express = require("express");
 const app = express();
+const bodyParser = require("body-parser");
+const morgan = require("morgan");
+const mongoose = require("mongoose");
+
 const productRoutes = require("./api/routes/products");
 const orderRoutes = require("./api/routes/orders");
 const userRoutes = require("./api/routes/users");
 const Status = require("./api/routes/status_codes");
-const bodyParser = require("body-parser");
-const morgan = require("morgan");
-const mongoose = require("mongoose");
 
 // Make use of morgan and body-parser imports
 

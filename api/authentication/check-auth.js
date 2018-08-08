@@ -12,7 +12,8 @@ module.exports = (req, res, next) => {
     } catch(err) {
         console.log(`Error.name: ${err.name}\r\nError.message: ${err.message}`);
         return res.status(Status.Unauthorized).json({
-            error: err
+            message: "Authentication failed",
+            error: err.message
         });
     }
 };
