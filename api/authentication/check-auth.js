@@ -5,6 +5,9 @@ module.exports = (req, res, next) => {
     try{
         // Retrieve constant value from Authorization header
         // splitting out 'Bearer' prefix
+        if(!req.headers.authorization){
+            throw new Error("Authentication token not present");
+        }
         const token = req.headers.authorization.split(" ")[1];
         const decoded = jwt.verify(token, process.env.JWT_KEY);
         req.userData = decoded;
