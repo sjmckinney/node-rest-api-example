@@ -56,7 +56,7 @@ exports.users_sign_up = (req, res, next) => {
                         .catch(err => {
                             console.log(err);
                             res.status(Status.ServerError).json({
-                                error: err
+                                error: err.message
                             });
                         });
                     }
