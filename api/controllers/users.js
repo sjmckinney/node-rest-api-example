@@ -66,18 +66,22 @@ exports.users_sign_up = (req, res, next) => {
 }
 
 exports.users_login = (req, res, next) => {
+
+    var authFailedMsg = "User authentication failed";
+    var authSucceededMsg = "User authentication succeeded";
+
     User.find({email: req.body.email})
         .exec()
         .then(user => {
             if(user.length < 1){
                 return res.status(Status.Unauthorized).json({
-                    message: "User authenication failed"
+                    message: authFailedMsg
             });    
         }
         bcrypt.compare(req.body.password, user[0].password, (err, result) => {
             if(err){
                 return res.status(Status.Unauthorized).json({
-                    message: "User authentication failed"
+                    message: authFailedMsg
                 });
             }
             if(result){
@@ -91,12 +95,12 @@ exports.users_login = (req, res, next) => {
                 }
                 );
                 return res.status(Status.Success).json({
-                    message: "User authentication succeeded",
+                    message: authSucceededMsg,
                     token: token
                 });
             }
             res.status(Status.Unauthorized).json({
-                message: "User authentication failed"
+                message: authFailedMsg
                 });
             });
         })
@@ -108,14 +112,14 @@ exports.users_login = (req, res, next) => {
     });
 }
 
-exports.users_delete_user_by_id = (req, res, next) => {
-    const id = req.params.userId;
-    User.remove({_id: id})
+exports.users_delete_user_by_email = (req, res, next) => {
+    const userEmail = req.params.email;
+    User.findOneAndRemove({email: userEmail})
         .exec()
         .then(result => {
             console.log(result);
             res.status(Status.Success).json({
-                message: `User ${id} deleted from system`
+                message: `User ${userEmail} deleted from system`
             });
         })
         .catch(err => {
@@ -124,4 +128,5 @@ exports.users_delete_user_by_id = (req, res, next) => {
                 error: err
             });
         });
+
 }

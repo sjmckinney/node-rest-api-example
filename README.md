@@ -6,29 +6,26 @@ This application user Express as web application framework. This makes 'routing'
 
 ### Getting Started
 
-* Create a [MongoDb Altas](https://www.mongodb.com/cloud/atlas) account. A free instance with 512Mb of storage can created on selected AWS regions. Follow the sign up instructions carefully to ensure you select one of the free regions. Create a simple user with read/write priveleges and copy the connection to _app.js_ file. Other MongoDb hosting providers are available.
+* Create a [MongoDb Altas](https://www.mongodb.com/cloud/atlas) account. A free instance with 512Mb of storage can created on selected AWS regions. Follow the sign up instructions carefully to ensure you select one of the free regions. Create a simple user with read/write priveleges and copy the connection parameters to the `Set up db connection` block in the  _app.js_ file. Other MongoDb hosting providers are available.
+
+* Alternatively use 'docker' to host a local `mongodb` instance. The script `build_mongodb_instance.sh`, once run will create a mongodb image and create the users required to access it.
 
 * Clone the repo locally and open a terminal or cmd window within the cloned directory.
 
-* Create the file 'nodemon.json' in the root directory of the project and add the following code substituting in the appropriate values in the second part of each line. There after use ```process.env.JWT_KEY``` etc. to refer to these values in code. This file is excluded from being pushed back to the repo by an entry in the _.gitignore_ file.
+* Create the file 'nodemon.json' in the root directory of the project and add the following code substituting in the appropriate values in the second part of each line. There after use `process.env.JWT_KEY` etc. to refer to these values in code. This file is excluded from being pushed back to the repo by an entry in the _.gitignore_ file.
 
 ```json
 {
     "env": {
         "MONGODB_ATLAS_CONNECTION_PWD": "my_password_value",
+        "MONGODB_LOCAL_PWD": "user",
         "JWT_KEY": "my_secret_value"
     }
 }
 ```
 * Run `npm install` to install all the required node packages.
 
-* Run `npm start` to start the application responding on _https://localhost:3000_.
-
-* Alternately run the following substituting in the appropriate values
-
-`PORT=3001 MONGODB_ATLAS_CONNECTION_PWD=<my password value> JWT_KEY=<my secret value> node server.js`
-
-The latter will allow the port the web app connects on to be specified on the command line otherwise it will default to _3000_.
+* Run `npm start-local` or `npm start-remote` to start the application connectiong to either a local mongodb instance in a docker image or a remote mongodb instance. Either way the API endpoints will respond on _https://localhost:3000_.
 
 * Use an http client or an app like Postman to create the requests to create products, users and orders that will illustrate the working of this application.
 
@@ -50,15 +47,17 @@ The morgan package is used to log the request and results to the console. An ins
 
 ### Data Persistence With MongoDb Atlas and Mongoose
 
-Create a connection to db in app.js using the string taken from the _MongoDb Atlas_ admin web page.
-```javascript
-mongoose.connect(`mongodb+srv://api-rest-rw-user:${process.env.MONGODB_ATLAS_CONNECTION_PWD}@cluster0-nebbb.mongodb.net/test?retryWrites=true`, { useNewUrlParser: true });
+A connection to mongodb is created in the file `app.js`. The connection created is dependent on the value of _process.env.NODE_ENV_. A value of "LOCAL" will create a connection to a local instance of mongodb whilst a value of "REMOTE" will connect to a remote instance if the correct values are substituted in.
+
+The correct format for the connection string for a _Mongodb Atlas_ instance can be located on _MongoDb Atlas_ admin web page.
 ```
-To work the Mongoose way create a "model" for the objects product and order objects.
+mongodb+srv://api-rest-rw-user:remote_user_pwd@cluster0-nebbb.mongodb.net/test?retryWrites=true
+```
+To work the "Mongoose way" _models_ representing the objects 'product', 'user' and 'order' objects are created.
 
-Within the 'models/product.js' and 'models/order.js' files define the schema for the product and order objects using Mongoose functionality.
+The 'models/product.js', 'models/order.js' and 'models/user.js' files define the schema for these objects.
 
-Use methods defined on each schema object to create, find, update and delete objects within the database.
+Methods defined on each schema object are used to create, find, update and delete objects within the database.
 
 Parameters are passed in the URL for GET and DELETE operations and extracted from the body for all other types.
 
@@ -137,7 +136,7 @@ Whenever the user wants to access a protected route or resource, the user agent 
 
 This can be, in certain cases, a stateless authorization mechanism. The server's protected routes will check for a valid JWT in the Authorization header, and if it's present, the user will be allowed to access protected resources.
 
-A JWT is generated following successful authenication of the user in the following way;
+A JWT is generated following successful authentication of the user in the following way;
 
 ```javascript
 if(result) {

@@ -10,6 +10,6 @@ router.post("/signup", UserController.users_sign_up);
 
 router.post("/login", UserController.users_login);
 
-router.delete("/:userId", checkAuth, UserController.users_delete_user_by_id);
+router.delete("/:email", checkAuth, UserController.users_delete_user_by_email);
 
 module.exports = router;

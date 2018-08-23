@@ -9,6 +9,8 @@ const orderRoutes = require("./api/routes/orders");
 const userRoutes = require("./api/routes/users");
 const Status = require("./api/routes/status_codes");
 
+let protocol, user, password, host;
+
 // Make use of morgan and body-parser imports
 
 app.use(morgan("dev"));
@@ -17,7 +19,27 @@ app.use(bodyParser.json());
 
 // Set up db connection
 
-mongoose.connect(`mongodb+srv://api-rest-rw-user:${process.env.MONGODB_ATLAS_CONNECTION_PWD}@cluster0-nebbb.mongodb.net/test?retryWrites=true`, { useNewUrlParser: true });
+switch(process.env.NODE_ENV) {
+    case "LOCAL":
+        protocol = "mongodb";
+        user = "user";
+        password = process.env.MONGODB_LOCAL_PWD;
+        host = "localhost:27017";
+        break;
+    case "REMOTE":
+        protocol = "mongodb+srv";
+        user = "api-rest-rw-user";
+        password = process.env.MONGODB_ATLAS_CONNECTION_PWD;
+        host = "cluster0-nebbb.mongodb.net";
+        break;
+    default:
+        console.log(`Value of NODE_ENV ${process.env.NODE_ENV} is not recognised`);
+}
+
+const connection_string = `${protocol}://${user}:${password}@${host}/test?retryWrites=true`;
+mongoose.connect(connection_string, { useNewUrlParser: true });
+
+console.log(`Current value of NODE_ENV: ${process.env.NODE_ENV} & connection string: ${connection_string}`)
 
 // Dealing with CORS
 
