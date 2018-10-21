@@ -25,7 +25,7 @@ This application user Express as web application framework. This makes 'routing'
 ```
 * Run `npm install` to install all the required node packages.
 
-* Run `npm start-local` or `npm start-remote` to start the application connectiong to either a local mongodb instance in a docker image or a remote mongodb instance. Either way the API endpoints will respond on _https://localhost:3000_.
+* Run `npm run start-local` or `npm run start-remote` to start the application connectiong to either a local mongodb instance in a docker image or a remote mongodb instance. Either way the API endpoints will respond on _https://localhost:3000_.
 
 * Use an http client or an app like Postman to create the requests to create products, users and orders that will illustrate the working of this application.
 
